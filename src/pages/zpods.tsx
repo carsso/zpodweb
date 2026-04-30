@@ -49,7 +49,7 @@ import { ZpodCreateDialog } from "@/components/zpod-create-dialog"
 import { BuildProgressHoverContent } from "@/components/build-progress-hover"
 import { buildHoverRows, groupDeployedByUid } from "@/lib/build-progress"
 import { flattenProfileItems } from "@/lib/profile-utils"
-import { cn, copyToClipboard } from "@/lib/utils"
+import { cn, copyToClipboard, formatDateTime } from "@/lib/utils"
 
 /** Group components by name and return "N x name" lines like the CLI */
 function groupComponents(components: ZpodComponentView[]): string[] {
@@ -137,6 +137,7 @@ const OPTIONAL_COLUMNS = [
   { key: "endpoint",   label: "Endpoint",   sortKey: "endpoint.name",                         breakpoint: "hidden 2xl:table-cell" },
   { key: "networks",   label: "Networks",   sortKey: "networks.0.cidr",                       breakpoint: "hidden xl:table-cell" },
   { key: "owners",     label: "Owner(s)",   sortKey: "permissions.0.users.0.username",         breakpoint: "hidden 2xl:table-cell" },
+  { key: "created",    label: "Creation date", sortKey: "creation_date",                       breakpoint: "hidden 3xl:table-cell" },
 ] as const
 
 type ColumnKey = (typeof OPTIONAL_COLUMNS)[number]["key"]
@@ -250,6 +251,7 @@ export function ZpodsPage() {
     endpoint: true,
     networks: true,
     owners: true,
+    created: false,
   }), [])
 
   const [columns, setColumns] = useState<Record<ColumnKey, boolean>>(columnDefaults)
@@ -567,6 +569,12 @@ export function ZpodsPage() {
                         {columns.owners && (
                           <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
                             {getOwners(zpod)}
+                          </TableCell>
+                        )}
+
+                        {columns.created && (
+                          <TableCell className="hidden 3xl:table-cell whitespace-nowrap tabular-nums">
+                            {formatDateTime(zpod.creation_date)}
                           </TableCell>
                         )}
 
